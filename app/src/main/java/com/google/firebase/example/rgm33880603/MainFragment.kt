@@ -32,6 +32,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import br.edu.up.rgm33880603.R
 import br.edu.up.rgm33880603.databinding.FragmentMainBinding
+import com.google.firebase.example.rgm33880603.model.Restaurant
 import com.google.firebase.example.rgm33880603.util.RestaurantUtil
 
 class MainFragment : Fragment(),
@@ -184,7 +185,34 @@ class MainFragment : Fragment(),
     }
 
     override fun onFilter(filters: Filters) {
-        // TODO(developer): Construct new query
+        // Construct query basic query
+        var query: Query = firestore.collection("restaurants")
+
+        // Category (equality filter)
+        if (filters.hasCategory()) {
+            query = query.whereEqualTo(Restaurant.FIELD_CATEGORY, filters.category)
+        }
+
+        // City (equality filter)
+        if (filters.hasCity()) {
+            query = query.whereEqualTo(Restaurant.FIELD_CITY, filters.city)
+        }
+
+        // Price (equality filter)
+        if (filters.hasPrice()) {
+            query = query.whereEqualTo(Restaurant.FIELD_PRICE, filters.price)
+        }
+
+        // Sort by (orderBy with direction)
+        if (filters.hasSortBy()) {
+            query = query.orderBy(filters.sortBy.toString(), filters.sortDirection)
+        }
+
+        // Limit items
+        query = query.limit(LIMIT.toLong())
+
+        // Update the query
+        adapter?.setQuery(query)
 
         // Set header
         binding.textCurrentSearch.text = HtmlCompat.fromHtml(
@@ -196,7 +224,6 @@ class MainFragment : Fragment(),
         // Save filters
         viewModel.filters = filters
     }
-
     private fun shouldStartSignIn(): Boolean {
         return !viewModel.isSigningIn && Firebase.auth.currentUser == null
     }
