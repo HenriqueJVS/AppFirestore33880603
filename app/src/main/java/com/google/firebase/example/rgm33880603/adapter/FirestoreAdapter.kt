@@ -55,9 +55,10 @@ abstract class FirestoreAdapter<VH : RecyclerView.ViewHolder>(private var query:
     private val snapshots = ArrayList<DocumentSnapshot>()
 
     fun startListening() {
-        // TODO(developer): Implement
+        if (registration == null) {
+            registration = query.addSnapshotListener(this)
+        }
     }
-
     fun stopListening() {
         registration?.remove()
         registration = null
