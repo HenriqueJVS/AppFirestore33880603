@@ -35,16 +35,21 @@ abstract class FirestoreAdapter<VH : RecyclerView.ViewHolder>(private var query:
             for (change in documentSnapshots.documentChanges) {
                 // snapshot of the changed document
                 when (change.type) {
-                    DocumentChange.Type.ADDED -> onDocumentAdded(change)
-                    DocumentChange.Type.MODIFIED -> onDocumentModified(change)
-                    DocumentChange.Type.REMOVED -> onDocumentRemoved(change)
+                    DocumentChange.Type.ADDED -> {
+                        onDocumentAdded(change) // Add this line
+                    }
+                    DocumentChange.Type.MODIFIED -> {
+                        onDocumentModified(change) // Add this line
+                    }
+                    DocumentChange.Type.REMOVED -> {
+                        onDocumentRemoved(change) // Add this line
+                    }
                 }
             }
         }
 
         onDataChanged()
     }
-
     private var registration: ListenerRegistration? = null
 
     private val snapshots = ArrayList<DocumentSnapshot>()
