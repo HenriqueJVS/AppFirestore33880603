@@ -8,6 +8,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import java.util.ArrayList
 import br.edu.up.rgm33880603.R
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.QuerySnapshot
 
@@ -21,6 +22,37 @@ import com.google.firebase.firestore.QuerySnapshot
 abstract class FirestoreAdapter<VH : RecyclerView.ViewHolder>(private var query: Query) :
     RecyclerView.Adapter<VH>(),
     EventListener<QuerySnapshot> { // Add this implements
+
+    override fun onEvent(documentSnapshots: QuerySnapshot?, e: FirebaseFirestoreException?) {
+
+        // Handle errors
+        if (e != null) {
+            Log.w(TAG, "onEvent:error", e)
+            return
+        }
+
+        // Dispatch the event
+        if (documentSnapshots != null) {
+            for (change in documentSnapshots.documentChanges) {
+                // snapshot of the changed document
+                when (change.type) {
+                    DocumentChange.Type.ADDED -> {
+                        // TODO: handle document added
+                    }
+                    DocumentChange.Type.MODIFIED -> {
+                        // TODO: handle document changed
+                    }
+                    DocumentChange.Type.REMOVED -> {
+                        // TODO: handle document removed
+                    }
+                }
+            }
+        }
+
+        onDataChanged()
+    }
+
+    // ...
     private var registration: ListenerRegistration? = null
 
     private val snapshots = ArrayList<DocumentSnapshot>()
