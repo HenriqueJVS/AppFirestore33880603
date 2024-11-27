@@ -6,11 +6,10 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
-import java.util.ArrayList
-import br.edu.up.rgm33880603.R
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.QuerySnapshot
+import java.util.ArrayList
 
 /**
  * RecyclerView adapter for displaying the results of a Firestore [Query].
@@ -36,15 +35,9 @@ abstract class FirestoreAdapter<VH : RecyclerView.ViewHolder>(private var query:
             for (change in documentSnapshots.documentChanges) {
                 // snapshot of the changed document
                 when (change.type) {
-                    DocumentChange.Type.ADDED -> {
-                        // TODO: handle document added
-                    }
-                    DocumentChange.Type.MODIFIED -> {
-                        // TODO: handle document changed
-                    }
-                    DocumentChange.Type.REMOVED -> {
-                        // TODO: handle document removed
-                    }
+                    DocumentChange.Type.ADDED -> onDocumentAdded(change)
+                    DocumentChange.Type.MODIFIED -> onDocumentModified(change)
+                    DocumentChange.Type.REMOVED -> onDocumentRemoved(change)
                 }
             }
         }
@@ -52,7 +45,6 @@ abstract class FirestoreAdapter<VH : RecyclerView.ViewHolder>(private var query:
         onDataChanged()
     }
 
-    // ...
     private var registration: ListenerRegistration? = null
 
     private val snapshots = ArrayList<DocumentSnapshot>()
@@ -94,6 +86,38 @@ abstract class FirestoreAdapter<VH : RecyclerView.ViewHolder>(private var query:
 
     protected fun getSnapshot(index: Int): DocumentSnapshot {
         return snapshots[index]
+    }
+
+    /**
+     * Called when a document is added to the query's result set.
+     */
+    private fun onDocumentAdded(change: DocumentChange) {
+        snapshots.add(change.newIndex, change.document)
+        notifyItemInserted(change.newIndex)
+    }
+
+    /**
+     * Called when a document in the query's result set is modified.
+     */
+    private fun onDocumentModified(change: DocumentChange) {
+        if (change.oldIndex == change.newIndex) {
+            // Item changed but remained in same position
+            snapshots[change.oldIndex] = change.document
+            notifyItemChanged(change.oldIndex)
+        } else {
+            // Item changed and changed position
+            snapshots.removeAt(change.oldIndex)
+            snapshots.add(change.newIndex, change.document)
+            notifyItemMoved(change.oldIndex, change.newIndex)
+        }
+    }
+
+    /**
+     * Called when a document is removed from the query's result set.
+     */
+    private fun onDocumentRemoved(change: DocumentChange) {
+        snapshots.removeAt(change.oldIndex)
+        notifyItemRemoved(change.oldIndex)
     }
 
     companion object {
