@@ -8,6 +8,8 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import java.util.ArrayList
 import br.edu.up.rgm33880603.R
+import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.QuerySnapshot
 
 /**
  * RecyclerView adapter for displaying the results of a Firestore [Query].
@@ -17,8 +19,8 @@ import br.edu.up.rgm33880603.R
  * many times as the user scrolls.
  */
 abstract class FirestoreAdapter<VH : RecyclerView.ViewHolder>(private var query: Query) :
-        RecyclerView.Adapter<VH>() {
-
+    RecyclerView.Adapter<VH>(),
+    EventListener<QuerySnapshot> { // Add this implements
     private var registration: ListenerRegistration? = null
 
     private val snapshots = ArrayList<DocumentSnapshot>()
